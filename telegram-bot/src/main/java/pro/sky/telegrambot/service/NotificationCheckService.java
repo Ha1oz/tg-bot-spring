@@ -13,11 +13,11 @@ import java.time.temporal.ChronoUnit;
 public class NotificationCheckService {
     private static final Logger log = LoggerFactory.getLogger(NotificationCheckService.class);
     private final NotificationService notificationService;
-    private final ExecuteService executeService;
+    private final MessageExecuteService messageExecuteService;
 
-    public NotificationCheckService(NotificationService notificationService, ExecuteService executeService) {
+    public NotificationCheckService(NotificationService notificationService, MessageExecuteService messageExecuteService) {
         this.notificationService = notificationService;
-        this.executeService = executeService;
+        this.messageExecuteService = messageExecuteService;
     }
     @Scheduled(cron = "0 0/1 * * * *")
     public void checkNotification() {
@@ -25,7 +25,7 @@ public class NotificationCheckService {
         log.info("Check notification with time {} in DB.", now);
 
         notificationService.findByDateFormat(now).forEach(n -> {
-            executeService.sendMessage(new SendMessage(n.getChatId(), n.getText()));
+            messageExecuteService.sendMessage(new SendMessage(n.getChatId(), n.getText()));
             notificationService.deleteNotification(n.getId());
         });
     }
